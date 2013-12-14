@@ -14,12 +14,14 @@ class Realtor:
 def albany():
 	i = 1
 	allhtml = []
-	while (i <= 5):
+	while (i <= 2):
 		html = urllib2.urlopen('http://www.albanyboardofrealtors.com/default.asp?content=agents&menu_id=235349&agt_off_option=last_name&page='+str(i))
 		soup = BS(html)
 		matches = soup.findAll('td')
-		for match in matches
-			if 'agent_heading_inline' is in match:
-				allhtml.append(soup.findAll('td'))
+		for match in matches:
+			print match
+			print "########################################"
+			if 'agent_heading_inline' in match:
+				allhtml.append(match)
 		i+=1
 	return allhtml
