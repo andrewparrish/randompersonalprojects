@@ -29,8 +29,30 @@ def albany():
 		i+=1
 	for tag in allhtml:
 		namegrab = tag.findAll('div', {'class' : 'agent_heading_inline'})
-		name = namegrab[0].getText()
+		fullname = namegrab[0].getText()
+		fullname = fullname.split()
+		name = fullname[0]+' '+fullname[1]
+		if 'Broker' in fullname:
+			title = 'Broker'
+		else:
+			title = ''
 		info = tag.findAll('div', {'class' : 'agent_info_inline'})
-	
-
-	return allhtml	
+		uneditedphone = info[0].getText()
+		broken = uneditedphone.split()
+		cutzip = broken[1].replace(')', '')
+		phone = cutzip+broken[2].replace('-', '')
+		phone = phone.replace('(', '')
+		if info[1].getText() is '' or info[1].getText() is None:
+			street = info[1].getText()
+		else:
+			street = info[1].getText()+' '+info[2].getText()
+		#email = info[3].getText()
+		if len(info) is 3:
+			print info
+		span = tag.findAll('span')
+		city = span[0].getText()
+		state = span[1].getText()
+		zipcode = span[2].getText()
+		#realtor = Realtor(name, title, phone, street, city, zipcode, state, email)
+		#realtors.append(realtor)
+	return realtors	
