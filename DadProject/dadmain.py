@@ -1,6 +1,7 @@
 #stuff	
 from BeautifulSoup import BeautifulSoup as BS
 import urllib2
+import re
 
 class Realtor:
 	def __init__(self, name, title, phone, street, city, zipcode, state, email):
@@ -36,23 +37,37 @@ def albany():
 			title = 'Broker'
 		else:
 			title = ''
-		info = tag.findAll('div', {'class' : 'agent_info_inline'})
-		uneditedphone = info[0].getText()
-		broken = uneditedphone.split()
-		cutzip = broken[1].replace(')', '')
-		phone = cutzip+broken[2].replace('-', '')
-		phone = phone.replace('(', '')
-		if info[1].getText() is '' or info[1].getText() is None:
-			street = info[1].getText()
-		else:
-			street = info[1].getText()+' '+info[2].getText()
-		#email = info[3].getText()
-		if len(info) is 3:
-			print info
-		span = tag.findAll('span')
-		city = span[0].getText()
-		state = span[1].getText()
-		zipcode = span[2].getText()
-		#realtor = Realtor(name, title, phone, street, city, zipcode, state, email)
-		#realtors.append(realtor)
+		infos = tag.findAll('div', {'class' : 'agent_info_inline'})
+		
+		#Necessary inputs
+		phone = ''
+		street = ''
+		zipcode = ''
+		city = ''
+		state = ''
+		email = ''
+		
+		for info in infos:
+			text = info.getText()
+			phoneregexp = re.compile('\(\d+\)')
+			addressregexp = re.compile('^\d+\s+\D+')
+			emailregexp = re.compile('\w+@\w+.\D+')
+
+			if phoneregexp.search(text) is not None:
+				if 'C' in text:
+					phone = text
+				else:
+					if phone is '':
+						phone = text
+			elif addressregexp.search(text) is not None:
+				street = text
+			elif emailregexp.search(text) is not None:
+				email = text
+			elif 'span' in str(info):
+				spans = tag.findAll('span')
+				city = spans[0].getText()
+				state = spans[1].getText()
+				zipcode = spans[2].getText()					
+		realtor = Realtor(name, title, phone, street, city, zipcode, state, email)
+		realtors.append(realtor)
 	return realtors	
