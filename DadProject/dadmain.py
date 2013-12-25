@@ -2,6 +2,7 @@
 from BeautifulSoup import BeautifulSoup as BS
 import urllib2
 import re
+import csv
 
 class Realtor:
 	def __init__(self, name, title, phone, street, city, zipcode, state, email):
@@ -15,12 +16,20 @@ class Realtor:
 			self.email = email
 
 
+#converting realtors array to csv file
+def csvrealtors(realtors):
+	csvfile = open('realtors.csv', 'wb')
+	writer = csv.writer(csvfile, delimiter=',')
+	writer.writerow(['Name', 'Title', 'Phone', 'Street', 'City', 'Zipcode', 'State', 'Email'])
+	for realtor in realtors:
+		writer.writerow([realtor.name, realtor.title, realtor.phone, realtor.street, realtor.city, realtor.zipcode, realtor.state, realtor.email])
+
 #albany realty site
 def albany():
 	i = 1
 	allhtml = []
 	realtors = []
-	while (i <= 2):
+	while (i <= 30):
 		html = urllib2.urlopen('http://www.albanyboardofrealtors.com/default.asp?content=agents&menu_id=235349&agt_off_option=last_name&page='+str(i))
 		soup = BS(html)
 		matches = soup.findAll('td')
@@ -52,6 +61,7 @@ def albany():
 			phoneregexp = re.compile('\(\d+\)')
 			addressregexp = re.compile('^\d+\s+\D+')
 			emailregexp = re.compile('\w+@\w+.\D+')
+			poboxregexp = re.compile('PO Box\s+\d+')
 
 			if phoneregexp.search(text) is not None:
 				if 'C' in text:
@@ -60,6 +70,8 @@ def albany():
 					if phone is '':
 						phone = text
 			elif addressregexp.search(text) is not None:
+				street = text
+			elif poboxregexp.search(text) is not None:
 				street = text
 			elif emailregexp.search(text) is not None:
 				email = text
